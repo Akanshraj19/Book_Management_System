@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <Booktitle>Dashboard</Booktitle>
+    <link rel="stylesheet" href="/dash.css" />
+    <script>
+      function confirmlogout(event) {
+        event.preventDefault(); //prevent form submission
+        if (confirm("Are you sure you want to logout?")) {
+          document.getElementById("logout-form").submit();
+        }
+      }
+    </script>
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css"> -->
+  </head>
+  <body>
+    <div class="logout-container">
+      <form id="logout-form" action="/logout" method="GET">
+        <button type="button" onclick="confirmlogout(event)">Logout</button>
+      </form>
+    </div>
+    <div class="container">
+      <h1>Welcome to the Dashboard</h1>
+      <h1>"<%- username %>"</h1>
+
+      <!-- create product form -->
+      <form id="createproductform">
+        <h2>Add Books</h2>
+        <input
+          type="text"
+          id="BookTitle"
+          name="BookTitle"
+          placeholder="BookTitle"
+          required
+        />
+        <input
+          type="text"
+          id="Author"
+          name="Author"
+          placeholder="Author"
+          required
+        />
+        <input
+          type="text"
+          id="genre"
+          name="genre"
+          placeholder="genre"
+          required
+        />
+        <input
+          type="number"
+          id="publicationYear"
+          name="publicationYear"
+          placeholder="publicationYear"
+          required
+        />
+        <input
+          type="text"
+          id="image"
+          name="Image URL"
+          placeholder="Image URL"
+          required
+        />
+        <button type="submit">Submit</button>
+      </form>
+      <div class="product-list" id="productList">
+        <h2>Product List</h2>
+        <table id="productList">
+          <thead>
+            <tr>
+              <th>BookTitle</th>
+              <th>Author</th>
+              <th>genre</th>
+              <th>publicationYear</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchproducts();
+      });
+      const gettokenfromcookies = () => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; token=`);
+        if (parts.length == 2) return parts.pop().split(";").shift();
+      };
+      const token = gettokenfromcookies();
+
+      // fetch and display products
+
+      async function fetchproducts() {
+        try {
+          const response = await fetch("/fetchbooks/", {
+            method: "GET",
+            body: JSON.stringify(),
+          });
+          const products = await response.json();
+          const productTableBody = document.getElementById("productTableBody");
+          productTableBody.innerHTML = ""; // Clear existing rows
+          products.forEach((product) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                        <td>${product.BookTitle}</td>
+                        <td>${product.Author}</td>
+                        <td>${product.genre}</td>
+                        <td>${product.publicationYear}</td>
+                        <td>
+                            <button type="button" onclick="updateProduct('${product._id}')">Update</button>
+                            <button type="button" onclick="deleteProduct('${product._id}');">Delete</button>
+                        `;
+            productTableBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Error Fetching Products:", error);
+        }
+      }
+
+      document
+        .getElementById("createproductform")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          try {
+            const BookTitle = document.getElementById("BookTitle").value;
+            const Author = document.getElementById("Author").value;
+            const genre = document.getElementById("genre").value;
+            const publicationYear = document.getElementById("publicationYear").value;
+            const image = document.getElementById("image").value;
+
+            const response = await fetch("/books", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                BookTitle,
+                Author,
+                genre,
+                publicationYear,
+                image,
+              }),
+            });
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+              alert("Unsuccesful in Product Creation");
+            }
+
+            // refresh product list
+            if (response.ok) {
+              alert("Product Created");
+              fetchproducts();
+
+              // clear the form fields
+              document.getElementById("createproductform").reset();
+            }
+          } catch (error) {
+            console.log("Error Creating Product:", error);
+          }
+        });
+      // delete Product
+      async function deleteProduct(id) {
+        if (!confirm("Are you sure you want to delete this product?")) {
+          return;
+        }
+        try {
+          const response = await fetch(`/books/${id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+              `HTTP error! status: ${response.status}, Response:${errorText}`
+            );
+          }
+          alert("Product Deleted Successfully!");
+          fetchproducts();
+        } catch (error) {
+          console.log("Error Deleting Product:", error);
+          alert(`Error deleting product: ${error.message}`);
+        }
+      }
+      // update product
+      async function updateProduct(id) {
+        const newBookTitle = prompt("Enter new Booktitle:");
+        const newAuthor = prompt("Enter new Author:");
+        const newgenre = prompt("Enter new genre:");
+        const newpublicationYear = prompt("Enter new publicationYear:");
+        try {
+          const response = await fetch(`/books/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              Booktitle: newBookTitle,
+              Author: newAuthor,
+              genre: newgenre,
+              publicationYear: newpublicationYear,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(
+              `HTTP error! status: ${response.status},Response:${errorText}`
+            );
+          }
+          alert("Product Updated Successfully!");
+          fetchproducts();
+        } catch (error) {
+          console.log("Error Updating Product:", error);
+          alert(`Error Updating product: ${error.message}`);
+        }
+      }
+    </script>
+  </body>
+</html>

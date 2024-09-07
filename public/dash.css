@@ -1,0 +1,79 @@
+body {
+  font-family: "Helvetica Neue", sans-serif;
+  background-color: #0f0f0f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 140vh;
+  margin: 0;
+  position: relative;
+}
+
+.container {
+  background-color: #c9dfec;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(240, 236, 236, 0.943);
+  width: 900px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+.logout-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+}
+.logout-container button {
+  background-color: rgb(181, 28, 28);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+}
+.logout-container button:hover {
+  background-color: #ff1c38;
+}
+form {
+  margin-bottom: 20px;
+}
+input,
+bottom {
+  padding: 10px;
+  margin: 5px 0;
+  width: calc(100% -20px);
+}
+button {
+  background-color: #a9121c;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+button:hover {
+  background-color: #0056b3;
+}
+.product-list {
+  margin-top: 20px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table th,
+td {
+  border: 1px solid #ddd;
+}
+th,
+td {
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+}

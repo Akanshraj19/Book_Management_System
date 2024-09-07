@@ -1,0 +1,15 @@
+.Home-page{
+    width: 100%;
+    min-height: 91.5vh;
+    max-height: auto;
+}
+.homing{
+    width: 500px;
+    height: 400px
+}
+.viewbook{
+    text-decoration: none;
+}
+.viewbook:hover{
+    color: aqua;
+}
